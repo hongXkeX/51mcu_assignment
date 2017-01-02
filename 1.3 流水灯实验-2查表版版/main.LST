@@ -1,0 +1,143 @@
+C51 COMPILER V9.01   MAIN                                                                  11/14/2016 16:52:59 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: F:\Program Files\Keil_v5\C51\BIN\C51.EXE main.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include"main.h"
+   2                                            // 1    2    3    4    5    6   7    8 
+   3          u8 code table[]={0,0xfe,0xfd,0xfb,0xf7,0xef,0xdf,0xbf,0x7f};
+   4          
+   5          u8 i = 0;
+   6          u8 t = 0;
+   7          
+   8          void main()
+   9          {
+  10   1              init_mcu();
+  11   1              while(1) 
+  12   1              {
+  13   2                      dis_chaLed();                           
+  14   2              }               
+  15   1      }
+  16          
+  17          /*
+  18                  查表方法实现D1-D8灯
+  19                  1.从左到右循环 2 次
+  20                  2.从右到左循环 2 次
+  21                  3.从左到右再从右到左 2 次
+  22                  4.两边到中间再从中间到两边 2 次
+  23                  间隔为100ms
+  24                  
+  25                  by hongXkeX
+  26                  2016.11.4
+  27          */
+  28          void dis_chaLed()
+  29          {
+  30   1              // 从左到右循环2次
+  31   1              t = 2;
+  32   1              while(t--) 
+  33   1              {
+  34   2                      for(i=8; i>0; i--)
+  35   2                      {
+  36   3                              P2 = table[i];
+  37   3                              delayms(100);
+  38   3                      }
+  39   2              }
+  40   1      
+  41   1              // 从右到左循环2次
+  42   1              t = 2;
+  43   1              while(t--) 
+  44   1              {
+  45   2                      for(i=1; i<9; i++) {
+  46   3                              P2 = table[i];
+  47   3                              delayms(100);
+  48   3                      }
+  49   2              }
+  50   1      
+  51   1              // 中间暂闪2下
+  52   1              t = 2;
+  53   1              while(t--) {
+  54   2                      P2 = 0xff;
+  55   2                      delayms(500);
+C51 COMPILER V9.01   MAIN                                                                  11/14/2016 16:52:59 PAGE 2   
+
+  56   2                      P2 = 0;
+  57   2                      delayms(500);
+  58   2              }       
+  59   1      
+  60   1              // 从左到右再从右到左2次
+  61   1              t = 2;
+  62   1              while(t--) 
+  63   1              {
+  64   2                      for(i=8; i>1; i--)
+  65   2                      {
+  66   3                              P2 = table[i];
+  67   3                              delayms(100);
+  68   3                      }
+  69   2                      for(i=1; i<8; i++)
+  70   2                      {
+  71   3                              P2 = table[i];
+  72   3                              delayms(100);
+  73   3                      }       
+  74   2              }
+  75   1      
+  76   1              // 中间暂闪2下
+  77   1              t = 2;
+  78   1              while(t--) {
+  79   2                      P2 = 0xff;
+  80   2                      delayms(500);
+  81   2                      P2 = 0;
+  82   2                      delayms(500);
+  83   2              }
+  84   1      
+  85   1              // 两边到中间再从中间到两边 2 次
+  86   1              t = 2;
+  87   1              while(t--)
+  88   1              {
+  89   2                      for(i=1; i<5; i++)
+  90   2                      {
+  91   3                              P2 = (table[i] & table[9-i]); 
+  92   3                              delayms(100);
+  93   3                      }
+  94   2                      for(i=3; i>1; i--)
+  95   2                      {
+  96   3                              P2 = (table[i] & table[9-i]); 
+  97   3                              delayms(100);
+  98   3                      }
+  99   2              }
+ 100   1              
+ 101   1              // 中间暂闪2下
+ 102   1              t = 2;
+ 103   1              while(t--) {
+ 104   2                      P2 = 0xff;
+ 105   2                      delayms(500);
+ 106   2                      P2 = 0;
+ 107   2                      delayms(500);
+ 108   2              }       
+ 109   1      }
+ 110          
+ 111          
+ 112          
+ 113          void init_mcu()
+ 114          {
+ 115   1              P2 = 0xff;
+ 116   1      }
+
+C51 COMPILER V9.01   MAIN                                                                  11/14/2016 16:52:59 PAGE 3   
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    366    ----
+   CONSTANT SIZE    =      9    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      2    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

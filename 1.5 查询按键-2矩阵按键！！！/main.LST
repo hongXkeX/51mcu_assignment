@@ -1,0 +1,140 @@
+C51 COMPILER V9.56.0.0   MAIN                                                              12/30/2016 14:40:31 PAGE 1   
+
+
+C51 COMPILER V9.56.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: F:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          /*
+   2                  独立按键控制小灯亮
+   3                  by hongke 2016-11-9
+   4          
+   5          */
+   6          #include "main.h"
+   7          
+   8          sbit key1 = P3^0;
+   9          sbit key2 = P3^1;
+  10          
+  11          sbit led1 = P2^0;
+  12          sbit led2 = P2^1;
+  13          sbit led3 = P2^2;
+  14          sbit led4 = P2^3;
+  15          sbit led5 = P2^4;
+  16          
+  17          u16 timer = 0;
+  18          u8 key;
+  19          
+  20          void main()
+  21          {
+  22   1              init_mcu();
+  23   1              while(1)
+  24   1              {
+  25   2                      if(key1 == 0) {
+  26   3                              delayms(20);
+  27   3                              if(key1 == 0) {
+  28   4                                      led1 = ~led1;
+  29   4                                      timer = 0; 
+  30   4                                      while(!key1 && timer++<800) 
+  31   4                                      {               
+  32   5                                              delay1ms(); 
+  33   5                                      }
+  34   4                              }               
+  35   3                      }
+  36   2                                              
+  37   2                      if(key2 == 0) {
+  38   3                              delayms(20);
+  39   3                              if(key2 == 0) {    
+  40   4                                      led2 = ~led2;
+  41   4                                      timer = 0; 
+  42   4                                      while(!key2 && timer++<800) 
+  43   4                                      {               
+  44   5                                              delay1ms(); 
+  45   5                                      }
+  46   4                              }               
+  47   3                      }
+  48   2                      
+  49   2                      key = get_keyval();
+  50   2                      if(key != 0xff) {
+  51   3                              delayms(20);
+  52   3                              if(key != 0xff) {
+  53   4                                      timer = 0;
+  54   4                                      switch(key) 
+  55   4                                      {
+C51 COMPILER V9.56.0.0   MAIN                                                              12/30/2016 14:40:31 PAGE 2   
+
+  56   5                                              case 0: led1=~led1; break;
+  57   5                                              case 1: led2=~led2; break;
+  58   5                                              case 2: led3=~led3; break;
+  59   5                                              case 3: led4=~led4; break;
+  60   5                                              case 4: led5=~led5; break;
+  61   5                                      }
+  62   4                                      while(key!=0xff && timer++<200) 
+  63   4                                      {               
+  64   5                                              delay1ms(); 
+  65   5                                      }
+  66   4                              }
+  67   3                      }                       
+  68   2              }       
+  69   1      }
+  70          
+  71          void init_mcu()
+  72          {
+  73   1              key1 = 1;
+  74   1              key2 = 1;
+  75   1              P2 = 0xff;      
+  76   1      }
+  77          
+  78          u8 get_keyval()
+  79          {
+  80   1              u8 tmp,ke;
+  81   1              u8 flag = 0;
+  82   1              u8 tmp1 = 0x7f; 
+  83   1              u8 i;
+  84   1              for(i=0; i<4; i++) 
+  85   1              {
+  86   2                      P1 = tmp1;
+  87   2                      tmp = P1 & 0x0f;
+  88   2                      if(tmp != 0x0f) {
+  89   3                              delayms(20);
+  90   3                              if(tmp != 0x0f){
+  91   4                                      flag = 1;
+  92   4                                      switch(tmp) {
+  93   5                                              case 0x07: ke = 0+i*4; break;
+  94   5                                              case 0x0b: ke = 1+i*4; break;
+  95   5                                              case 0x0d: ke = 2+i*4; break;
+  96   5                                              case 0x0e: ke = 3+i*4; break;
+  97   5                                      }
+  98   4                              }else {
+  99   4                                      flag = 0;               
+ 100   4                              }
+ 101   3                      }       
+ 102   2                      tmp1 = _cror_(tmp1, 1);
+ 103   2              }
+ 104   1              if(flag == 1) {
+ 105   2                      return ke;
+ 106   2              }else {
+ 107   2                      return 0xff;
+ 108   2              }
+ 109   1      }
+ 110          
+ 111          
+ 112          
+ 113          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    338    ----
+C51 COMPILER V9.56.0.0   MAIN                                                              12/30/2016 14:40:31 PAGE 3   
+
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      3       5
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

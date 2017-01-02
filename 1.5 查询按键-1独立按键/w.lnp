@@ -1,0 +1,5 @@
+"STARTUP.obj",
+"delay.obj",
+"main.obj" 
+TO "w" 
+RAMSIZE(256) 

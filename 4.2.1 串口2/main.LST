@@ -1,0 +1,116 @@
+C51 COMPILER V9.56.0.0   MAIN                                                              12/11/2016 11:50:33 PAGE 1   
+
+
+C51 COMPILER V9.56.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: F:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include "main.h"
+   2          
+   3          bit bRevData;
+   4          u8 RvBuf = 0;
+   5          
+   6          u8 TxBuf[7] = { 0 };
+   7          u8 guTxCounter = 0;
+   8          u8 sum = 0;
+   9          u8 TxLength = 7;
+  10          u8 code flag = 0x13;
+  11          
+  12          void main()
+  13          {
+  14   1              u8 j;
+  15   1              Init_MCU();
+  16   1              EA = 1;
+  17   1              while(1) 
+  18   1              {
+  19   2                      if( bRevData ) // 串口接收到数据 
+  20   2                      {
+  21   3                              bRevData = 0; // 清除标志位
+  22   3                              delayms(10);
+  23   3                              TxBuf[0] = 0xFF;  // 前导符
+  24   3                              TxBuf[1] = 0xFF;  
+  25   3                              
+  26   3                              TxBuf[2] = 0xAA;     // addr
+  27   3                              TxBuf[3] = 0x00;     // sn
+  28   3                              TxBuf[4] = 0x01;     // length
+  29   3                              
+  30   3                              if( flag == RvBuf ) {
+  31   4                                      TxBuf[5] = 0xAA;    // dat
+  32   4                              } else {
+  33   4                                      TxBuf[5] = 0x55;    // dat
+  34   4                              }
+  35   3                              
+  36   3                              sum = 0;              
+  37   3                              for( j = 2; j < 6; j++ ) {
+  38   4                                      sum += TxBuf[j];
+  39   4                              } 
+  40   3                              sum = sum % 256;
+  41   3                              TxBuf[6] = sum;     // crc
+  42   3                              TxLength = 6;
+  43   3                              
+  44   3                              delayms(100);
+  45   3                              guTxCounter = 0;
+  46   3                              SBUF = TxBuf[0]; // 发送首字节 在中断中发送下一个字节
+  47   3                      }
+  48   2                      P1 = 0;
+  49   2                      delayms(500);
+  50   2                      P1 = 0xff;
+  51   2                      delayms(500);
+  52   2              }               
+  53   1      }
+  54          
+  55          void Init_MCU(void)
+C51 COMPILER V9.56.0.0   MAIN                                                              12/11/2016 11:50:33 PAGE 2   
+
+  56          {
+  57   1              P1 = 0xff;
+  58   1              SIO_Init();
+  59   1      }
+  60          
+  61          void SIO_Init(void)
+  62          {
+  63   1              SCON = 0x50; // 模式
+  64   1              
+  65   1              TMOD &= 0x0F;
+  66   1              TMOD |= 0x20;
+  67   1              
+  68   1              TH1 = TL1 = 0xfd;
+  69   1              TR1 = 1;
+  70   1              ES = 1;
+  71   1      }
+  72          
+  73          void SIO_ISR(void) interrupt 4
+  74          {
+  75   1              if( RI )  // 接收中断 
+  76   1              {
+  77   2                      RI = 0;
+  78   2                      bRevData = 1;
+  79   2                      RvBuf = SBUF;
+  80   2              }
+  81   1              if( TI )  // 发送中断
+  82   1              {
+  83   2                      TI = 0;
+  84   2                      if( guTxCounter < TxLength )
+  85   2                      {
+  86   3                              SBUF = TxBuf[++guTxCounter];
+  87   3                      } else {
+  88   3                              guTxCounter = 0;
+  89   3                      }
+  90   2              }
+  91   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    188    ----
+   CONSTANT SIZE    =      1    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     11    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

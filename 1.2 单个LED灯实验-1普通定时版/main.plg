@@ -1,0 +1,58 @@
+<html>
+<body>
+<pre>
+<h1>礦ision Build Log</h1>
+<h2>Project:</h2>
+F:\Program Files\keil4_code\单片机实验作业\1.2 单个LED灯实验-1普通定时版\main.uvproj
+Project File Date:  10/10/2016
+
+<h2>Output:</h2>
+compiling main.c...
+main.c - 0 Error(s), 0 Warning(s).
+Build target 'Target 1'
+compiling delay.c...
+DELAY.C(33): warning C235: parameter 1: different types
+linking...
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?DELAY500MS?DELAY
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_DELAYMS?DELAY
+Program Size: data=9.0 xdata=0 code=116
+creating hex file from "main"...
+"main" - 0 Error(s), 3 Warning(s).
+compiling main.c...
+main.c - 0 Error(s), 0 Warning(s).
+Build target 'Target 1'
+linking...
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?DELAY500MS?DELAY
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_DELAY_MS?DELAY
+Program Size: data=9.0 xdata=0 code=116
+creating hex file from "main"...
+"main" - 0 Error(s), 2 Warning(s).
+Build target 'Target 1'
+assembling STARTUP.A51...
+compiling main.c...
+compiling delay.c...
+DELAY.C(33): warning C235: parameter 1: different types
+linking...
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?DELAY1MS?DELAY
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?DELAY500MS?DELAY
+Program Size: data=9.0 xdata=0 code=96
+creating hex file from "main"...
+"main" - 0 Error(s), 3 Warning(s).
+compiling delay.c...
+DELAY.C(33): warning C235: parameter 1: different types
+delay.c - 0 Error(s), 1 Warning(s).
+Build target 'Target 1'
+linking...
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?DELAY1MS?DELAY
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?DELAY500MS?DELAY
+Program Size: data=9.0 xdata=0 code=96
+creating hex file from "main"...
+"main" - 0 Error(s), 2 Warning(s).

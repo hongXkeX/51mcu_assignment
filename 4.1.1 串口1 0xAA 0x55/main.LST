@@ -1,0 +1,90 @@
+C51 COMPILER V9.56.0.0   MAIN                                                              12/11/2016 11:38:52 PAGE 1   
+
+
+C51 COMPILER V9.56.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: F:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include "main.h"
+   2          
+   3          bit bRevData;
+   4          u8 RxBuf = 0;
+   5          u8 code flag = 0x13;
+   6          
+   7          void main()
+   8          {
+   9   1              init();
+  10   1              EA = 1;
+  11   1              while(1) 
+  12   1              {
+  13   2                      if( bRevData ) 
+  14   2                      {
+  15   3                              bRevData = 0;
+  16   3                              if( flag == RxBuf ) {
+  17   4                                      delayms(100);
+  18   4                                      SBUF = 0xAA;
+  19   4                              } else {
+  20   4                                      delayms(100);
+  21   4                                      SBUF = 0x55;
+  22   4                              }
+  23   3                      }                               
+  24   2              }               
+  25   1      }
+  26          
+  27          
+  28          void init()
+  29          {
+  30   1              P1 = 0xff;
+  31   1              init_sio();
+  32   1      }
+  33          
+  34          void init_sio()
+  35          {
+  36   1              SCON &= 0X0f; // mode 1 
+  37   1              SCON |= 0X50;
+  38   1      
+  39   1              TMOD &= 0X0f;
+  40   1              TMOD |= 0x02<<4;
+  41   1      
+  42   1              TH1 = 0xfd;
+  43   1              TL1 = 0xfd;
+  44   1              TR1 = 1;
+  45   1              ES = 1;
+  46   1      
+  47   1              SM0 = 0;
+  48   1              SM1 = 1;
+  49   1                      
+  50   1      }
+  51          
+  52          void sio_isr(void) interrupt 4
+  53          {
+  54   1              if( RI ) 
+  55   1              {
+C51 COMPILER V9.56.0.0   MAIN                                                              12/11/2016 11:38:52 PAGE 2   
+
+  56   2                      RI = 0;
+  57   2                      RxBuf = SBUF;
+  58   2                      bRevData = 1;
+  59   2              }
+  60   1              if( TI ) 
+  61   1              {
+  62   2                      TI = 0;
+  63   2              }
+  64   1      }
+  65          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     91    ----
+   CONSTANT SIZE    =      1    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      1    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

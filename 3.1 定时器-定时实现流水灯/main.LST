@@ -1,0 +1,86 @@
+C51 COMPILER V9.56.0.0   MAIN                                                              11/17/2016 18:18:23 PAGE 1   
+
+
+C51 COMPILER V9.56.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: F:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include"main.h"
+   2          
+   3          bit flag = 0;
+   4          u8 k = 0;
+   5          u8 i = 0;
+   6          
+   7          void main()
+   8          {
+   9   1              init();
+  10   1              EA = 1;
+  11   1              while(1) 
+  12   1              {
+  13   2                      if(k>=20 && flag == 1 ) 
+  14   2                      {
+  15   3                              k = 0;
+  16   3                              P2 = ~(0x80>>i);
+  17   3                              i++;
+  18   3                              if(i>6){
+  19   4                                      i = 0;
+  20   4                                      flag = 0;
+  21   4                              }               
+  22   3                      }
+  23   2              
+  24   2                      if(k>=20 && flag == 0){
+  25   3                              k = 0;
+  26   3                              P2 = ~(0x01<<i);
+  27   3                              i++;
+  28   3                              if(i>6){
+  29   4                                      i = 0;
+  30   4                                      flag = 1;
+  31   4                              } 
+  32   3                      }
+  33   2                                      
+  34   2              }               
+  35   1      }
+  36          
+  37          void init()
+  38          {
+  39   1              t0_init();
+  40   1      }
+  41          
+  42          void t0_init()
+  43          {
+  44   1              TMOD &= (0xf0);            
+  45   1              TMOD |= (0x01);
+  46   1      
+  47   1              TH0 = (65536-10000)/256;
+  48   1              TL0 = (65536-10000)%256;
+  49   1              
+  50   1              ET0 = 1;
+  51   1              TR0 = 1;
+  52   1      }
+  53          
+  54          void t0_isr() interrupt 1
+  55          {
+C51 COMPILER V9.56.0.0   MAIN                                                              11/17/2016 18:18:23 PAGE 2   
+
+  56   1              TH0 = (65536-10000)/256;
+  57   1              TL0 = (65536-10000)%256;
+  58   1              k++;
+  59   1      }
+  60          
+  61          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    121    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      2    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

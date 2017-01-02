@@ -1,0 +1,117 @@
+C51 COMPILER V9.56.0.0   MAIN                                                              12/30/2016 14:21:12 PAGE 1   
+
+
+C51 COMPILER V9.56.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: F:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include "main.h"
+   2          
+   3          u8 code table[]={0,0xfe,0xfd,0xfb,0xf7,0xef,0xdf,0xbf,0x7f};
+   4          
+   5          u8 k = 0;
+   6          u8 i = 8;
+   7          bit flag1 = 0;
+   8          bit flag2 = 0;
+   9          bit flag3 = 0;
+  10          bit flag4 = 0;
+  11          
+  12          void main()
+  13          {
+  14   1              init_mcu();
+  15   1              t0_init();
+  16   1              EA = 1;
+  17   1              flag1 = 1;
+  18   1              while(1) 
+  19   1              {
+  20   2                      if( k >= 20 && flag1 == 1 ) {
+  21   3                              k = 0;
+  22   3                              P2 = table[i];
+  23   3                              i--;
+  24   3                              if( i < 2 ){
+  25   4                                      i = 1;
+  26   4                                      flag1 = 0;
+  27   4                                      flag2 = 1;
+  28   4                              }               
+  29   3                      }
+  30   2              
+  31   2                      if( k >= 20 && flag2 == 1 ){
+  32   3                              k = 0;
+  33   3                              P2 = table[i];
+  34   3                              i++;
+  35   3                              if( i > 7 ){
+  36   4                                      i = 1;
+  37   4                                      flag2 = 0;
+  38   4                                      flag3 = 1;      
+  39   4                              } 
+  40   3                      }
+  41   2              
+  42   2                      if( k >= 20 && flag3 == 1 )
+  43   2                      {
+  44   3                              k = 0;
+  45   3                              P2 = (table[i] & table[9-i]);                   
+  46   3                              i++;
+  47   3                              if( i > 3) 
+  48   3                              {
+  49   4                                      i = 4;
+  50   4                                      flag3 = 0;
+  51   4                                      flag4 = 1;              
+  52   4                              }
+  53   3                      }
+  54   2      
+  55   2                      if( k >= 20 && flag4 == 1)
+C51 COMPILER V9.56.0.0   MAIN                                                              12/30/2016 14:21:12 PAGE 2   
+
+  56   2                      {
+  57   3                              k = 0;
+  58   3                              P2 = (table[i] & table[9-i]);                   
+  59   3                              i--;
+  60   3                              if( i < 1 ) 
+  61   3                              {
+  62   4                                      i = 8;
+  63   4                                      flag4 = 0;
+  64   4                                      flag1 = 1;              
+  65   4                              }
+  66   3                      }
+  67   2              }               
+  68   1      }
+  69          
+  70          void init_mcu()
+  71          {
+  72   1              P2 = 0xff;
+  73   1      }
+  74          
+  75          void t0_init()
+  76          {
+  77   1              TMOD &= (0xf0);        // TMOD = XXXX0000          
+  78   1              TMOD |= (0x01);             // TMOD = XXXX0001
+  79   1              // 12M 一个机器周期1us   
+  80   1              TH0 = (65536-5000)/256; // 5ms 中断一次
+  81   1              TL0 = (65536-5000)%256;
+  82   1              
+  83   1              ET0 = 1;                                // 开定时器0中断
+  84   1              TR0 = 1;                                // 启动定时器0
+  85   1      }
+  86          
+  87          void t0_isr() interrupt 1
+  88          {
+  89   1              TH0 = (65536-5000)/256;
+  90   1              TL0 = (65536-5000)%256;
+  91   1              k++;
+  92   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    245    ----
+   CONSTANT SIZE    =      9    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      2    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      4    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

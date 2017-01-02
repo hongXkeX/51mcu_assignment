@@ -1,0 +1,74 @@
+C51 COMPILER V9.01   W                                                                     11/14/2016 20:58:45 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE W
+OBJECT MODULE PLACED IN w.OBJ
+COMPILER INVOKED BY: F:\Program Files\Keil_v5\C51\BIN\C51.EXE w.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          /*
+   2                  独立按键控制小灯亮
+   3                  by hongke 2016-11-9
+   4          
+   5          */
+   6          #include"main.h"
+   7          
+   8          sbit key1 = P3^2;
+   9          sbit led1 = P2^0;
+  10          
+  11          sbit key2 = P3^3;
+  12          sbit led2 = P2^1;
+  13          
+  14          u32 timer1 = 0;
+  15          
+  16          void main()
+  17          {
+  18   1              init_mcu();
+  19   1              while(1)
+  20   1              {
+  21   2                      if(key1 == 0) {
+  22   3                              delay_ms(50);
+  23   3                              if(key1 == 0) {
+  24   4                                      led1 = ~led1;
+  25   4                                      timer1 = 0; 
+  26   4                                      while(!key1 && timer1++<2000) 
+  27   4                                      {               
+  28   5                                              delay1ms(); 
+  29   5                                      }
+  30   4                              }               
+  31   3                      }                       
+  32   2                      if(key2 == 0) {
+  33   3                              delay_ms(50);
+  34   3                              if(key2 == 0) {    
+  35   4                                      led2 = ~led2;
+  36   4                              }               
+  37   3                      }                       
+  38   2              }       
+  39   1      }
+  40          
+  41          void init_mcu()
+  42          {
+  43   1              key1 = 1;
+  44   1              key2 = 1;
+  45   1              P1 = 0xff;      
+  46   1      }
+  47          
+  48          
+  49          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     78    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+C51 COMPILER V9.01   W                                                                     11/14/2016 20:58:45 PAGE 2   
+
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      4    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

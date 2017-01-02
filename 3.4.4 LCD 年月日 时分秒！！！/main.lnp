@@ -1,0 +1,7 @@
+"STARTUP.obj",
+"main.obj",
+"delay.obj",
+"1602.obj",
+"ds1302.obj" 
+TO "main" 
+RAMSIZE(256) 

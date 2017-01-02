@@ -1,0 +1,165 @@
+C51 COMPILER V9.56.0.0   MAIN                                                              12/30/2016 15:28:20 PAGE 1   
+
+
+C51 COMPILER V9.56.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: F:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include "main.h"
+   2          
+   3          u8 usartbuf[7]={ 0 };
+   4          u8 usrtlen = 0;
+   5          u8 checksum;
+   6          bit bRevData;
+   7          u8 RvBuf = 0;
+   8          u8 num_usart;
+   9          u8 usarrtflag;
+  10          u8 sn;
+  11          
+  12          sbit key1 = P3^0;
+  13          u16 timer = 0;
+  14          
+  15          u8 mcu_send[7]={0xff,0xff,0xaa,0x01,0x01,0xaa,0x5B};
+  16          
+  17          void main()
+  18          {
+  19   1              init();
+  20   1              Usart_Init();
+  21   1              EA = 1;
+  22   1              while( 1 ) 
+  23   1              {
+  24   2                      if(key1 == 0) {
+  25   3                              delayms(20);
+  26   3                              if(key1 == 0) {
+  27   4                                      Usart_SendArrang( mcu_send, 7 );
+  28   4                                      timer = 0; 
+  29   4                                      while(!key1 && timer++<800) 
+  30   4                                      {               
+  31   5                                              delay1ms(); 
+  32   5                                      }
+  33   4                              }               
+  34   3                      }
+  35   2                      Usart_Communication();  
+  36   2              }               
+  37   1      }
+  38          
+  39          void init(void)
+  40          {
+  41   1              P1 = 0xff;
+  42   1      }
+  43          
+  44          /* 初始化函数 */
+  45          void Usart_Init() 
+  46          {
+  47   1              TMOD = 0x21;                                    //定时器0工作方式1，定时器1工作方式2
+  48   1              TH0 = ( 65536 - 10000 ) / 256;
+  49   1              TL0 = ( 65536 - 10000 ) % 256;
+  50   1              TH1 = 0xfd;
+  51   1              TL1 = 0xfd;
+  52   1              TR0 = 1;                        // 定时器0开始计时
+  53   1              TR1 = 1;                        // 定时器1开始计时
+  54   1              REN = 1;
+  55   1              SM0 = 0;
+C51 COMPILER V9.56.0.0   MAIN                                                              12/30/2016 15:28:20 PAGE 2   
+
+  56   1              SM1 = 1;
+  57   1              EA = 1;
+  58   1              ES = 1;
+  59   1      }
+  60          
+  61          /* 串口中断函数 */
+  62          void Usart_Int() interrupt 4
+  63          {
+  64   1              num_usart = 0;
+  65   1              ET0 = 1;
+  66   1              TR0 = 1;
+  67   1              if( RI )  // 接收中断 
+  68   1              {
+  69   2                      RI = 0;
+  70   2                      usartbuf[ usrtlen++ ] = SBUF;
+  71   2              }
+  72   1              if( usrtlen == 2 )
+  73   1              {
+  74   2                      if( usartbuf[0] == 0xff && usartbuf[1] == 0xff )
+  75   2                      {
+  76   3                              usrtlen = 0;
+  77   3                      }
+  78   2              }
+  79   1      }
+  80          
+  81          void Usart_Communication()
+  82          {
+  83   1              u8 i;
+  84   1              if( num_usart >= 10 )               // 100ms
+  85   1              {
+  86   2                      ET0 = 0;                        // switch off time0
+  87   2                      num_usart = 0;      
+  88   2                      usarrtflag = 1;
+  89   2                      REN = 0;                        // switch off usart
+  90   2              } 
+  91   1              if( usarrtflag ) 
+  92   1              {
+  93   2                      sn = usartbuf[3];
+  94   2                      checksum = 0;
+  95   2                      if( usartbuf[5] == 0x13 ) {
+  96   3                              mcu_send[5] = 0xAA;
+  97   3                      } else {
+  98   3                              mcu_send[5] = 0x55;
+  99   3                      }
+ 100   2                      
+ 101   2                      checksum = 0;              
+ 102   2                      for( i = 2; i < 6; i++ ) {
+ 103   3                              checksum += mcu_send[i];
+ 104   3                      } 
+ 105   2                      checksum = checksum % 256;
+ 106   2                      mcu_send[6] = checksum;
+ 107   2                      mcu_send[3] = sn;
+ 108   2                      
+ 109   2                      Usart_SendArrang( mcu_send, 7 );
+ 110   2                      
+ 111   2                      usrtlen = 0;
+ 112   2                      usarrtflag = 0;
+ 113   2                      REN = 1;
+ 114   2              }
+ 115   1              
+ 116   1      }
+ 117          
+C51 COMPILER V9.56.0.0   MAIN                                                              12/30/2016 15:28:20 PAGE 3   
+
+ 118          /* mcu发送数据程序 */
+ 119          void Usart_SendArrang( u8 *dat, u8 len )
+ 120          {
+ 121   1              unsigned char i;
+ 122   1              ES = 0;
+ 123   1              for( i = 0; i < len; i++ )
+ 124   1              {
+ 125   2                      SBUF = dat[i];
+ 126   2                      while( !TI );
+ 127   2                      TI = 0;
+ 128   2              } 
+ 129   1              ES = 1;
+ 130   1      }
+ 131          
+ 132          /* 定时器0中断 */
+ 133          void Timer0_Int() interrupt 1
+ 134          {
+ 135   1              TH0 = ( 65536 - 10000 ) / 256;
+ 136   1              TL0 = ( 65536 - 10000 ) % 256;
+ 137   1              num_usart++;
+ 138   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    292    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     22       3
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,369 @@
+C51 COMPILER V9.56.0.0   MAIN                                                              11/30/2016 17:26:35 PAGE 1   
+
+
+C51 COMPILER V9.56.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: F:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          /*-----------------------------------------------
+   2            名称：秒表
+   3            编写：hongXkeX
+   4            日期：2016.11.17
+   5            修改：无
+   6            内容：
+   7          ------------------------------------------------*/
+   8          
+   9          #include "main.h"
+  10          
+  11          sbit key1 = P3^3; 
+  12          sbit hc573_le = P1^0;
+  13          unsigned char tep = 0;
+  14          unsigned char code ledteble[11] = {0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0};
+  15          u8 DisplayData[8];
+  16          unsigned char Disbuff[9] = { 0,1,2,3,4,5,6,7,8 };
+  17          unsigned char k = 0;
+  18          unsigned char s = 0;
+  19          unsigned int timer = 0;
+  20          unsigned char key1_num = 0;
+  21          
+  22          sbit LSA=P2^2;
+  23          sbit LSB=P2^3;
+  24          sbit LSC=P2^4;
+  25          
+  26          /*------------------------------------------------
+  27                              主程序
+  28          ------------------------------------------------*/
+  29          void main()
+  30          {
+  31   1              init();
+  32   1              EA = 1;         //总中断打开
+  33   1              Ds1302Init();
+  34   1              Int1Init();
+  35   1              datapros_init();
+  36   1              while(1) 
+  37   1              {
+  38   2                      
+  39   2                      DigDisplay();
+  40   2                      if(key1_num <= 1) {
+  41   3                              datapros1();
+  42   3                      }
+  43   2                      
+  44   2                      /*
+  45   2                      displayChar(Disbuff, 8);
+  46   2                      if(key1_num<=1) {
+  47   2                              datapros1();
+  48   2                      }*/
+  49   2              }               
+  50   1      }
+  51          
+  52          /*------------------------------------------------
+  53                       单片机初始化子程序
+  54          ------------------------------------------------*/
+  55          void init()
+C51 COMPILER V9.56.0.0   MAIN                                                              11/30/2016 17:26:35 PAGE 2   
+
+  56          {
+  57   1              P2 = 0xff;
+  58   1              hc573_le = 1;
+  59   1      }
+  60          
+  61          /*------------------------------------------------
+  62                        显示多位数码管子程序 1
+  63          ------------------------------------------------*/
+  64          void displayChar(u8* buf, u8 len)
+  65          {
+  66   1              u8 i;
+  67   1              if( len > 8 )  len = 8;
+  68   1              for(i = 1; i <= len; i++ )
+  69   1              {
+  70   2                      displayLed(i, buf[i]);  
+  71   2                      delayms(1);
+  72   2              }
+  73   1              for( ; i <= 8; i++ ) 
+  74   1              {
+  75   2                      displayLed(i, 10);
+  76   2                      delayms(1);                     
+  77   2              }
+  78   1      }
+  79          
+  80          /*------------------------------------------------
+  81                        显示多位数码管子程序 2
+  82          ------------------------------------------------*/
+  83          void displayChar2(u8* buf, u8 begin, u8 len)
+  84          {
+  85   1              u8 i;
+  86   1              if( (begin + len) > 8 )  len = 8 - begin;
+  87   1              for(i = 1; i <= len; i++ )
+  88   1              {
+  89   2                      displayLed(begin, buf[i]);      
+  90   2                      delayms(1);
+  91   2                      begin++;
+  92   2              }
+  93   1              for( ; i <= 8; i++ ) 
+  94   1              {
+  95   2                      displayLed(i, 10);
+  96   2                      delayms(1);                     
+  97   2              }
+  98   1      }
+  99                                                            
+ 100          /*------------------------------------------------
+ 101                         显示单独数码管子程序
+ 102          
+ 103                  show ledteble[seg] in add
+ 104                  add:1 2 3 4 5 6 7 8
+ 105                  seg:0 ~ 9    10 is none
+ 106          ------------------------------------------------*/
+ 107          void displayLed(u8 add, u8 seg)
+ 108          {
+ 109   1              P0 = 0;   
+ 110   1              if(seg > 10 || add > 8) return;
+ 111   1              add = 8 - add;                          // 优化                 
+ 112   1              tep &= ~(7<<2);  
+ 113   1              tep |= add<<2;   
+ 114   1              P2 = tep;
+ 115   1              _nop_();
+ 116   1              _nop_();
+ 117   1              P0 = ledteble[seg];
+C51 COMPILER V9.56.0.0   MAIN                                                              11/30/2016 17:26:35 PAGE 3   
+
+ 118   1              _nop_();
+ 119   1      }
+ 120          
+ 121          /*------------------------------------------------
+ 122                         显示单独数码管子程序 2
+ 123                  
+ 124                  show ledteble[seg] in add
+ 125                  add:1 2 3 4 5 6 7 8
+ 126                  seg:0 ~ 9    10 is none
+ 127          ------------------------------------------------*/
+ 128          void displayLed2(u8 add, u8 seg)
+ 129          {
+ 130   1              P0 = 0;   
+ 131   1              if(seg > 10 || add > 8) return;
+ 132   1              add = 8 - add;                          // 优化                 
+ 133   1              tep &= ~(7<<2);  
+ 134   1              tep |= add<<2;   
+ 135   1              P2 = tep;
+ 136   1              _nop_();
+ 137   1              _nop_();
+ 138   1              P0 = ledteble[seg] | 0x80;
+ 139   1              _nop_();
+ 140   1      }
+ 141          
+ 142          /*******************************************************************************
+ 143          * 函数名         : DigDisplay()
+ 144          * 函数功能               : 数码管显示函数
+ 145          * 输入           : 无
+ 146          * 输出           : 无
+ 147          *******************************************************************************/
+ 148          void DigDisplay()
+ 149          {
+ 150   1              u8 i;
+ 151   1              for(i=0; i<8; i++)
+ 152   1              {
+ 153   2                      switch(i)        //位选，选择点亮的数码管，
+ 154   2                      {
+ 155   3                              case(0):
+ 156   3                                      LSA=0;LSB=0;LSC=0; break;//显示第0位
+ 157   3                              case(1):
+ 158   3                                      LSA=1;LSB=0;LSC=0; break;//显示第1位
+ 159   3                              case(2):
+ 160   3                                      LSA=0;LSB=1;LSC=0; break;//显示第2位
+ 161   3                              case(3):
+ 162   3                                      LSA=1;LSB=1;LSC=0; break;//显示第3位
+ 163   3                              case(4):
+ 164   3                                      LSA=0;LSB=0;LSC=1; break;//显示第4位
+ 165   3                              case(5):
+ 166   3                                      LSA=1;LSB=0;LSC=1; break;//显示第5位
+ 167   3                              case(6):
+ 168   3                                      LSA=0;LSB=1;LSC=1; break;//显示第6位
+ 169   3                              case(7):
+ 170   3                                      LSA=1;LSB=1;LSC=1; break;//显示第7位    
+ 171   3                      }
+ 172   2                      P0=DisplayData[7-i];  //发送数据
+ 173   2                      delay(100);           //间隔一段时间扫描        
+ 174   2                      P0=0x00;              //消隐
+ 175   2              }               
+ 176   1      }
+ 177          
+ 178          /*******************************************************************************
+ 179          * 函 数 名         : datapros()
+C51 COMPILER V9.56.0.0   MAIN                                                              11/30/2016 17:26:35 PAGE 4   
+
+ 180          * 函数功能                 : 时间读取处理转换函数
+ 181          * 输    入         : 无
+ 182          * 输    出         : 无
+ 183          *******************************************************************************/
+ 184          /*
+ 185          void datapros_init()     
+ 186          {
+ 187                  Ds1302ReadTime();
+ 188                  Disbuff[1] = ledteble[TIME[2]/16];                              //时
+ 189                  Disbuff[2] = ledteble[TIME[2]%16];                               
+ 190                  Disbuff[3] = 0x40;
+ 191                  Disbuff[4] = ledteble[TIME[1]/16];                              //分
+ 192                  Disbuff[5] = ledteble[TIME[1]%16];      
+ 193                  Disbuff[6] = 0x40;
+ 194                  Disbuff[7] = ledteble[TIME[0]/16];                              //秒
+ 195                  Disbuff[8] = ledteble[TIME[0]%16];
+ 196          }
+ 197          
+ 198          void datapros1()         
+ 199          {
+ 200                  Ds1302ReadTime();
+ 201                  Disbuff[1] = ledteble[TIME[2]/16];                              //时
+ 202                  Disbuff[2] = ledteble[TIME[2]%16];                               
+ 203                  Disbuff[3] = 0x40;
+ 204                  Disbuff[4] = ledteble[TIME[1]/16];                              //分
+ 205                  Disbuff[5] = ledteble[TIME[1]%16];      
+ 206                  Disbuff[6] = 0x40;
+ 207                  Disbuff[7] = ledteble[TIME[0]/16];                              //秒
+ 208                  Disbuff[8] = ledteble[TIME[0]%16];
+ 209          }
+ 210          
+ 211          void datapros2()         
+ 212          {
+ 213                  Ds1302ReadTime();
+ 214                  Disbuff[1] = ledteble[TIME[4]/16];                              //月
+ 215                  Disbuff[2] = ledteble[TIME[4]%16];                               
+ 216                  Disbuff[3] = 0x40;
+ 217                  Disbuff[4] = ledteble[TIME[3]/16];                              //日
+ 218                  Disbuff[5] = ledteble[TIME[3]%16];      
+ 219                  Disbuff[6] = 0x40;
+ 220                  Disbuff[7] = ledteble[TIME[5]/16];                              //周
+ 221                  Disbuff[8] = ledteble[TIME[5]%16];
+ 222          }
+ 223          
+ 224          void datapros3()         
+ 225          {
+ 226                  Ds1302ReadTime();
+ 227                  Disbuff[1] = ledteble[TIME[6]/16];                              //年
+ 228                  Disbuff[2] = ledteble[TIME[6]%16];                               
+ 229                  Disbuff[3] = 0x40;
+ 230                  Disbuff[4] = ledteble[TIME[4]/16];                              //月
+ 231                  Disbuff[5] = ledteble[TIME[4]%16];      
+ 232                  Disbuff[6] = 0x40;
+ 233                  Disbuff[7] = ledteble[TIME[3]/16];                              //日
+ 234                  Disbuff[8] = ledteble[TIME[3]%16];
+ 235          }
+ 236          */
+ 237          
+ 238          
+ 239          void datapros_init()     
+ 240          {
+ 241   1              Ds1302ReadTime();
+C51 COMPILER V9.56.0.0   MAIN                                                              11/30/2016 17:26:35 PAGE 5   
+
+ 242   1              DisplayData[0] = ledteble[TIME[2]/16];                          //时
+ 243   1              DisplayData[1] = ledteble[TIME[2]%16];                           
+ 244   1              DisplayData[2] = 0x40;
+ 245   1              DisplayData[3] = ledteble[TIME[1]/16];                          //分
+ 246   1              DisplayData[4] = ledteble[TIME[1]%16];  
+ 247   1              DisplayData[5] = 0x40;
+ 248   1              DisplayData[6] = ledteble[TIME[0]/16];                          //秒
+ 249   1              DisplayData[7] = ledteble[TIME[0]%16];
+ 250   1      }
+ 251          
+ 252          void datapros1()         
+ 253          {
+ 254   1              Ds1302ReadTime();
+ 255   1              DisplayData[0] = ledteble[TIME[2]/16];                          //时
+ 256   1              DisplayData[1] = ledteble[TIME[2]%16];                           
+ 257   1              DisplayData[2] = 0x40;
+ 258   1              DisplayData[3] = ledteble[TIME[1]/16];                          //分
+ 259   1              DisplayData[4] = ledteble[TIME[1]%16];  
+ 260   1              DisplayData[5] = 0x40;
+ 261   1              DisplayData[6] = ledteble[TIME[0]/16];                          //秒
+ 262   1              DisplayData[7] = ledteble[TIME[0]%16];
+ 263   1      }
+ 264          
+ 265          void datapros2()         
+ 266          {
+ 267   1              Ds1302ReadTime();
+ 268   1              DisplayData[0] = ledteble[TIME[4]/16];                          //月
+ 269   1              DisplayData[1] = ledteble[TIME[4]%16];                           
+ 270   1              DisplayData[2] = 0x40;
+ 271   1              DisplayData[3] = ledteble[TIME[3]/16];                          //日
+ 272   1              DisplayData[4] = ledteble[TIME[3]%16];  
+ 273   1              DisplayData[5] = 0x40;
+ 274   1              DisplayData[6] = ledteble[TIME[5]/16];                          //周     
+ 275   1              DisplayData[7] = ledteble[TIME[5]%16];
+ 276   1      }
+ 277          
+ 278          void datapros3()         
+ 279          {
+ 280   1              Ds1302ReadTime();
+ 281   1              DisplayData[0] = ledteble[TIME[6]/16];                          //年
+ 282   1              DisplayData[1] = ledteble[TIME[6]%16];                           
+ 283   1              DisplayData[2] = 0x40;
+ 284   1              DisplayData[3] = ledteble[TIME[4]/16];                          //月
+ 285   1              DisplayData[4] = ledteble[TIME[4]%16];  
+ 286   1              DisplayData[5] = 0x40;
+ 287   1              DisplayData[6] = ledteble[TIME[3]/16];                          //日     
+ 288   1              DisplayData[7] = ledteble[TIME[3]%16];
+ 289   1      }
+ 290          
+ 291          /*******************************************************************************
+ 292          * 函 数 名         : Int1Init()
+ 293          * 函数功能                 : 设置外部中断1
+ 294          * 输    入         : 无
+ 295          * 输    出         : 无
+ 296          *******************************************************************************/
+ 297          void Int1Init()
+ 298          {
+ 299   1              //设置INT0
+ 300   1              IT1=1;//跳变沿出发方式（下降沿）
+ 301   1              EX1=1;//打开INT0的中断允许。    
+ 302   1              EA=1;//打开总中断       
+ 303   1      }
+C51 COMPILER V9.56.0.0   MAIN                                                              11/30/2016 17:26:35 PAGE 6   
+
+ 304          
+ 305          /*******************************************************************************
+ 306          * 函 数 名         : Int1()     interrupt 3
+ 307          * 函数功能                 : 外部中断1的中断函数
+ 308          * 输    入         : 无
+ 309          * 输    出         : 无
+ 310          *******************************************************************************/
+ 311          
+ 312          void Int1()     interrupt 2             //外部中断1的中断函数
+ 313          {
+ 314   1              delayms(20);     //延时消抖
+ 315   1              if(key1==0)
+ 316   1              {
+ 317   2                      key1_num++;
+ 318   2                      timer = 0; 
+ 319   2                      while(!key1 && timer++<800) 
+ 320   2                      {               
+ 321   3                              delay1ms(); 
+ 322   3                      }
+ 323   2                      if(key1_num > 3) {
+ 324   3                              key1_num = 1;
+ 325   3                      }
+ 326   2                      if(key1_num == 1) {
+ 327   3                              datapros1();
+ 328   3                      }
+ 329   2                      if(key1_num == 2) {
+ 330   3                              datapros2();
+ 331   3                      }
+ 332   2                      if(key1_num == 3) {
+ 333   3                              datapros3();
+ 334   3                      }
+ 335   2              }
+ 336   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    799    ----
+   CONSTANT SIZE    =     11    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     23      12
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

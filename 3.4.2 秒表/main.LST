@@ -1,0 +1,233 @@
+C51 COMPILER V9.56.0.0   MAIN                                                              11/21/2016 22:04:25 PAGE 1   
+
+
+C51 COMPILER V9.56.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: F:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          /*-----------------------------------------------
+   2            名称：通过定时0产生2KHz方波
+   3            编写：hongXkeX
+   4            日期：2016.11.17
+   5            修改：无
+   6          ------------------------------------------------*/
+   7          
+   8          #include "main.h"
+   9          
+  10          sbit key1 = P3^3; 
+  11          sbit hc573_le = P1^0;
+  12          unsigned char tep = 0;
+  13          unsigned char code ledteble[11] = {0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0};
+  14          unsigned char Disbuff[9] = {0,0,0,2};
+  15          unsigned char k = 0;
+  16          unsigned char s = 0;
+  17          unsigned int timer = 0;
+  18          unsigned char key1_num = 0;
+  19          
+  20          /*------------------------------------------------
+  21                              主程序
+  22          ------------------------------------------------*/
+  23          void main()
+  24          {
+  25   1              init();
+  26   1              EA = 1;         //总中断打开
+  27   1              while(1) 
+  28   1              {
+  29   2                      //静态扫面
+  30   2                      //displayLed2(1, 1);
+  31   2                      //displayLed(2, 1);
+  32   2                      //delayms(2);
+  33   2                      
+  34   2                      // 动态扫描
+  35   2                      /*
+  36   2                      u8 i;
+  37   2                      for(i=0; i<8; i++) 
+  38   2                      {
+  39   2                              displayLed(i+1, i);
+  40   2                              delay300us();
+  41   2                      }
+  42   2                      */      
+  43   2      //              displayChar2(Disbuff, 3, 3);            
+  44   2      //              displayChar(Disbuff, 3);
+  45   2      //              displayChar(Disbuff, 2);
+  46   2                      keyscan();
+  47   2                      Disbuff[1] = s/10;
+  48   2                      Disbuff[2] = s%10;
+  49   2                      displayLed2(1, Disbuff[1]);
+  50   2                      delayms(2);
+  51   2                      displayLed(2, Disbuff[2]);
+  52   2                      delayms(2);
+  53   2              }               
+  54   1      }
+  55          
+C51 COMPILER V9.56.0.0   MAIN                                                              11/21/2016 22:04:25 PAGE 2   
+
+  56          void keyscan()
+  57          {
+  58   1              if(key1 == 0) {
+  59   2                      delayms(20);
+  60   2                      if(key1 == 0) {
+  61   3                              key1_num++;
+  62   3                              timer = 0; 
+  63   3                              while(!key1 && timer++<800) 
+  64   3                              {               
+  65   4                                      delay1ms(); 
+  66   4                              }
+  67   3                              if(key1_num > 3) {
+  68   4                                      key1_num = 1;
+  69   4                              }
+  70   3                              if(key1_num == 1) {
+  71   4                                      TR0 = 1;
+  72   4                              }
+  73   3                              if(key1_num == 2) {
+  74   4                                      TR0 = 0;
+  75   4                              }
+  76   3                              if(key1_num == 3) {
+  77   4                                      s = 0;
+  78   4                              }
+  79   3                      }               
+  80   2              }
+  81   1      }
+  82          
+  83          /*------------------------------------------------
+  84                       单片机初始化子程序
+  85          ------------------------------------------------*/
+  86          void init()
+  87          {
+  88   1              t0_init();
+  89   1              P2 = 0xff;
+  90   1              hc573_le = 1;
+  91   1      }
+  92          
+  93          /*------------------------------------------------
+  94                        显示多位数码管子程序 1
+  95          ------------------------------------------------*/
+  96          void displayChar(u8* buf, u8 len)
+  97          {
+  98   1              u8 i;
+  99   1              if( len > 8 )  len = 8;
+ 100   1              for(i = 1; i <= len; i++ )
+ 101   1              {
+ 102   2                      displayLed(i, buf[i]);  
+ 103   2                      delay300us();
+ 104   2              }
+ 105   1              for( ; i <= 8; i++ ) 
+ 106   1              {
+ 107   2                      displayLed(i, 10);
+ 108   2                      delay300us();                   
+ 109   2              }
+ 110   1      }
+ 111          
+ 112          /*------------------------------------------------
+ 113                        显示多位数码管子程序 2
+ 114          ------------------------------------------------*/
+ 115          void displayChar2(u8* buf, u8 begin, u8 len)
+ 116          {
+ 117   1              u8 i;
+C51 COMPILER V9.56.0.0   MAIN                                                              11/21/2016 22:04:25 PAGE 3   
+
+ 118   1              if( (begin + len) > 8 )  len = 8 - begin;
+ 119   1              for(i = 1; i <= len; i++ )
+ 120   1              {
+ 121   2                      displayLed(begin, buf[i]);      
+ 122   2                      delay300us();
+ 123   2                      begin++;
+ 124   2              }
+ 125   1              for( ; i <= 8; i++ ) 
+ 126   1              {
+ 127   2                      displayLed(i, 10);
+ 128   2                      delay300us();                   
+ 129   2              }
+ 130   1      }
+ 131          
+ 132                                                            
+ 133          /*------------------------------------------------
+ 134                         显示单独数码管子程序
+ 135                  
+ 136                  show ledteble[seg] in add
+ 137                  add:1 2 3 4 5 6 7 8
+ 138                  seg:0 ~ 9    10 is none
+ 139          ------------------------------------------------*/
+ 140          void displayLed(u8 add, u8 seg)
+ 141          {
+ 142   1              P0 = 0;   
+ 143   1              if(seg > 10 || add > 7) return;
+ 144   1              add = 8 - add;                          // 优化                 
+ 145   1              tep &= ~(7<<2);  
+ 146   1              tep |= add<<2;   
+ 147   1              P2 = tep;
+ 148   1              _nop_();
+ 149   1              _nop_();
+ 150   1              P0 = ledteble[seg];
+ 151   1              _nop_();
+ 152   1      }
+ 153          
+ 154          /*------------------------------------------------
+ 155                         显示单独数码管子程序 2
+ 156                  
+ 157                  show ledteble[seg] in add
+ 158                  add:1 2 3 4 5 6 7 8
+ 159                  seg:0 ~ 9    10 is none
+ 160          ------------------------------------------------*/
+ 161          void displayLed2(u8 add, u8 seg)
+ 162          {
+ 163   1              P0 = 0;   
+ 164   1              if(seg > 10 || add > 7) return;
+ 165   1              add = 8 - add;                          // 优化                 
+ 166   1              tep &= ~(7<<2);  
+ 167   1              tep |= add<<2;   
+ 168   1              P2 = tep;
+ 169   1              _nop_();
+ 170   1              _nop_();
+ 171   1              P0 = ledteble[seg] | 0x80;
+ 172   1              _nop_();
+ 173   1      }
+ 174          
+ 175          /*------------------------------------------------
+ 176                        定时器0初始化子程序
+ 177          ------------------------------------------------*/
+ 178          void t0_init()
+ 179          {
+C51 COMPILER V9.56.0.0   MAIN                                                              11/21/2016 22:04:25 PAGE 4   
+
+ 180   1              TMOD &= (0xf0);            
+ 181   1              TMOD |= (0x01);     //使用模式1，16位定时器
+ 182   1      
+ 183   1              TH0 = (65536-5000)/256;
+ 184   1              TL0 = (65536-5000)%256;
+ 185   1              
+ 186   1              ET0 = 1;                //定时器中断打开
+ 187   1      //      TR0 = 1;                //定时器开关打开
+ 188   1      }
+ 189          
+ 190          /*------------------------------------------------
+ 191                          定时器0中断子程序
+ 192          ------------------------------------------------*/
+ 193          void t0_isr() interrupt 1
+ 194          {
+ 195   1              TH0 = (65536-5000)/256;    
+ 196   1              TL0 = (65536-5000)%256;   
+ 197   1          k++;
+ 198   1              if( k >= 20 ) {          // 500ms   k >= 20 is for 1s
+ 199   2                      k = 0;
+ 200   2                      s++;
+ 201   2                      if(s > 99) s = 0;
+ 202   2              }
+ 203   1      }
+ 204          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    454    ----
+   CONSTANT SIZE    =     11    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     15      11
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

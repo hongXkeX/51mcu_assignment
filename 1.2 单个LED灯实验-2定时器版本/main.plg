@@ -1,0 +1,73 @@
+<html>
+<body>
+<pre>
+<h1>礦ision Build Log</h1>
+<h2>Project:</h2>
+F:\Program Files\keil4_code\单片机实验作业\1.2 单个LED灯实验-2定时器版本\main.uvproj
+Project File Date:  10/10/2016
+
+<h2>Output:</h2>
+compiling main.c...
+main.c - 0 Error(s), 0 Warning(s).
+Build target 'Target 1'
+linking...
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?T0_INIT?MAIN
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?DELAY500MS?DELAY
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_DELAY_MS?DELAY
+Program Size: data=10.0 xdata=0 code=251
+creating hex file from "main"...
+"main" - 0 Error(s), 3 Warning(s).
+compiling main.c...
+MAIN.C(11): error C202: 'k': undefined identifier
+MAIN.C(12): error C202: 'k': undefined identifier
+main.c - 2 Error(s), 0 Warning(s).
+Build target 'Target 1'
+compiling main.c...
+MAIN.C(11): error C202: 'k': undefined identifier
+MAIN.C(12): error C202: 'k': undefined identifier
+Target not created
+compiling main.c...
+MAIN.C(11): error C202: 'k': undefined identifier
+MAIN.C(12): error C202: 'k': undefined identifier
+main.c - 2 Error(s), 0 Warning(s).
+Build target 'Target 1'
+compiling main.c...
+MAIN.C(11): error C202: 'k': undefined identifier
+MAIN.C(12): error C202: 'k': undefined identifier
+Target not created
+compiling main.c...
+MAIN.C(8): warning C206: 't0_init': missing function-prototype
+MAIN.C(22): error C231: 't0_init': redefinition
+MAIN.C(31): error C231: 't0_init': redefinition
+main.c - 2 Error(s), 1 Warning(s).
+Build target 'Target 1'
+compiling main.c...
+MAIN.C(8): warning C206: 't0_init': missing function-prototype
+MAIN.C(22): error C231: 't0_init': redefinition
+MAIN.C(31): error C231: 't0_init': redefinition
+Target not created
+Build target 'Target 1'
+compiling main.c...
+compiling delay.c...
+linking...
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?DELAY500MS?DELAY
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_DELAY_MS?DELAY
+Program Size: data=10.0 xdata=0 code=234
+creating hex file from "main"...
+"main" - 0 Error(s), 2 Warning(s).
+compiling main.c...
+main.c - 0 Error(s), 0 Warning(s).
+Build target 'Target 1'
+linking...
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?DELAY500MS?DELAY
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_DELAY_MS?DELAY
+Program Size: data=10.0 xdata=0 code=254
+creating hex file from "main"...
+"main" - 0 Error(s), 2 Warning(s).
